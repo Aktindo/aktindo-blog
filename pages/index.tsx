@@ -63,7 +63,7 @@ export const Home: FC<HomeProps> = ({ allPostsData, blogCategories }) => {
 
 export default Home;
 
-export async function getServerSideProps() {
+export async function getStaticProps() {
   const allPostsData = getSortedPostsData();
 
   let blogCategories: string[] = [];
