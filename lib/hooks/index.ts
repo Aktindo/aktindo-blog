@@ -1,0 +1,1 @@
+export { useDocumentMetaData } from "./useDocumentMetaData";

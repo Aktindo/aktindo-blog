@@ -1,0 +1,1 @@
+export { navigateToPage } from "./navigateToPage";

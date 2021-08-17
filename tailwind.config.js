@@ -1,12 +1,68 @@
 module.exports = {
-  mode: 'jit',
-  purge: ['./pages/**/*.{js,ts,jsx,tsx}', './components/**/*.{js,ts,jsx,tsx}'],
+  purge: ["./pages/**/*.{js,ts,jsx,tsx}", "./components/**/*.{js,ts,jsx,tsx}"],
   darkMode: false, // or 'media' or 'class'
   theme: {
-    extend: {},
+    fontFamily: {
+      inter: ["Inter", "sans-serif"],
+      poppins: ["Poppins", "sans-serif"],
+    },
+    extend: { colors: require("daisyui/colors") },
   },
   variants: {
     extend: {},
   },
-  plugins: [],
-}
+  plugins: [require("@tailwindcss/typography"), require("daisyui")],
+  options: {
+    safelist: [/data-theme$/],
+  },
+  daisyui: {
+    themes: [
+      {
+        light: {
+          primary: "#4297BA",
+          "primary-focus": "#3e86a3",
+          "primary-content": "#ffffff",
+          secondary: "#D2C87C",
+          "secondary-focus": "#bfb66d",
+          "secondary-content": "#ffffff",
+          accent: "#37cdbe",
+          "accent-focus": "#2aa79b",
+          "accent-content": "#ffffff",
+          neutral: "#3d4451",
+          "neutral-focus": "#2a2e37",
+          "neutral-content": "#ffffff",
+          "base-100": "#ffffff",
+          "base-200": "#f9fafb",
+          "base-300": "#d1d5db",
+          "base-content": "#1f2937",
+          info: "#2094f3",
+          success: "#009485",
+          warning: "#ff9900",
+          error: "#e74c3c",
+        },
+        dark: {
+          primary: "#4297BA",
+          "primary-focus": "#3e86a3",
+          "primary-content": "#ffffff",
+          secondary: "#D2C87C",
+          "secondary-focus": "#bfb66d",
+          "secondary-content": "#ffffff",
+          accent: "#37cdbe",
+          "accent-focus": "#2aa79b",
+          "accent-content": "#ffffff",
+          neutral: "#2A2E37",
+          "neutral-focus": "#16181D",
+          "neutral-content": "#ffffff",
+          "base-100": "#3D4451",
+          "base-200": "#2A2E37",
+          "base-300": "#16181D",
+          "base-content": "#EBECF0",
+          info: "#2094f3",
+          success: "#009485",
+          warning: "#ff9900",
+          error: "#e74c3c",
+        },
+      },
+    ],
+  },
+};

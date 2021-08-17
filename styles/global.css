@@ -1,0 +1,33 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Poppins:wght@400;500;700&display=swap");
+
+::selection,
+::moz-selection,
+::webkit-selection {
+  @apply bg-primary text-white;
+}
+
+h1,
+h2,
+h3 {
+  font-family: "Poppins", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.btn {
+  font-family: "Inter", sans-serif;
+}
+
+.task-list-item {
+  @apply flex items-center;
+}
+
+.task-list-item-checkbox {
+  @apply checkbox checkbox-xs mr-1;
+}
+
+.divider:before {
+  @apply bg-base-300;
+}
+
+.divider:after {
+  @apply bg-base-300;
+}
