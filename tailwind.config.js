@@ -1,6 +1,6 @@
 module.exports = {
   purge: ["./pages/**/*.{js,ts,jsx,tsx}", "./components/**/*.{js,ts,jsx,tsx}"],
-  darkMode: false, // or 'media' or 'class'
+  darkMode: "class", // or 'media' or 'class'
   theme: {
     fontFamily: {
       inter: ["Inter", "sans-serif"],
@@ -55,7 +55,7 @@ module.exports = {
           "neutral-content": "#ffffff",
           "base-100": "#3D4451",
           "base-200": "#2A2E37",
-          "base-300": "#16181D",
+          "base-300": "#24272e",
           "base-content": "#EBECF0",
           info: "#2094f3",
           success: "#009485",

@@ -48,7 +48,7 @@ const BlogPost: React.SFC<BlogPostProps> = ({ post }) => {
         <div className="blog__card-title font-semibold font-poppins text-2xl">
           {title}
         </div>
-        <div className="blog__card-description text-gray-600">
+        <div className="blog__card-description text-gray-600 dark:text-gray-300">
           {description}
         </div>
         <div className="blog__card-bottom mt-10 mb-2">
@@ -60,12 +60,12 @@ const BlogPost: React.SFC<BlogPostProps> = ({ post }) => {
             </div>
             {!postLoading && !commentsLoading ? (
               <div className="blog__card-bottom__stats ml-auto">
-                <span className="blog__card-bottom__stats-likes text-gray-600">
+                <span className="blog__card-bottom__stats-likes text-gray-600 dark:text-gray-300">
                   <FontAwesomeIcon icon={faThumbsUp} />{" "}
                   {postSnapshot?.usersLiked?.length || 0}
                 </span>
 
-                <span className="blog__card-bottom__stats-comemnts text-gray-600 ml-5">
+                <span className="blog__card-bottom__stats-comemnts text-gray-600 dark:text-gray-300 ml-5">
                   <FontAwesomeIcon icon={faCommentAlt} />{" "}
                   {commentsSnapshot?.docs?.length}
                 </span>
@@ -77,7 +77,9 @@ const BlogPost: React.SFC<BlogPostProps> = ({ post }) => {
             )}
           </div>
           <div className="divider"></div>
-          <p className="text-sm text-gray-600">Posted on {date}</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">
+            Posted on {date}
+          </p>
         </div>
       </div>
     </div>

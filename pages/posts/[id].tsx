@@ -113,7 +113,7 @@ const Post: React.FC<PostProps> = ({ postData }) => {
 
   return (
     <section
-      className={`${postData.title} flex flex-col min-h-screen font-inter`}
+      className={`${postData.title} flex flex-col min-h-screen font-inter bg-base-100 text-base-content`}
     >
       {useDocumentMetaData(postData.title, postData.description)}
       <Header />
@@ -133,7 +133,7 @@ const Post: React.FC<PostProps> = ({ postData }) => {
         <div className="mt-5 flex">
           <div className="flex items-center">
             <button
-              className={`btn btn-sm text-gray-600${
+              className={`btn btn-sm ${
                 postSnapshot?.usersLiked?.find(
                   (userLiked) => userLiked?.id === user?.uid
                 )
@@ -202,7 +202,7 @@ const Post: React.FC<PostProps> = ({ postData }) => {
             <div>
               <p className="text-xl font-poppins font-bold">
                 {commentsSnapshot?.docs?.length} Comments{" "}
-                <span className="text-sm text-gray-600">
+                <span className="text-sm text-gray-600 dark:text-gray-300">
                   (login to post a comment)
                 </span>
               </p>
@@ -236,7 +236,7 @@ const Post: React.FC<PostProps> = ({ postData }) => {
                 return (
                   <div className="comment flex bg-base-200 px-2 py-4 my-2 rounded-box max-w-prose">
                     <div className="avatar">
-                      <div className="rounded-full w-10 h-10 ring ring-primary ring-offset-2 mx-2">
+                      <div className="rounded-full w-10 h-10 ring ring-primary ring-offset-2 dark:ring-offset-0 mx-2">
                         <img
                           src={commentData?.user.photoURL}
                           alt={`${commentData?.user.name}'s Avatar`}
@@ -248,7 +248,7 @@ const Post: React.FC<PostProps> = ({ postData }) => {
                         <div className="flex">
                           <p className="font-medium flex w-full">
                             <span>{commentData?.user.name}</span>
-                            <span className="ml-1 text-sm mt-0.5 text-gray-600">
+                            <span className="ml-1 text-sm mt-0.5 text-gray-600 dark:text-gray-300">
                               {dayjs(commentData?.postedOn?.toDate()).fromNow()}
                             </span>
                           </p>

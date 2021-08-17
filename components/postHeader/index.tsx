@@ -18,7 +18,7 @@ const PostHeader: React.SFC<PostHeaderProps> = ({ postData }) => {
       <p className="post-header__title text-2xl md:text-4xl lg:text-5xl font-poppins font-semibold">
         {postData.title}
       </p>
-      <p className="post-header__description text-lg md:text-xl">
+      <p className="post-header__description dark:text-gray-300 text-gray-600 text-lg md:text-xl">
         {postData.description}
       </p>
       <div className="post-header__author flex items-center mt-5">
@@ -34,7 +34,7 @@ const PostHeader: React.SFC<PostHeaderProps> = ({ postData }) => {
         </div>
         <div className="post-header__author-info ml-3">
           <p className="text-primary">Aktindo</p>
-          <p className="text-gray-600 text-sm">
+          <p className="text-gray-600 dark:text-gray-300 text-sm">
             Posted on {postData.date} • {getReadingTime(postData.contentHtml)}
           </p>
         </div>

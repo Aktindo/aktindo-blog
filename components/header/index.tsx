@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { navigateToPage } from "../../lib/helpers/index";
@@ -9,7 +9,12 @@ import { LoginModal } from "..";
 import { toast, useDisclosure, useToast } from "@chakra-ui/react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../../firebase";
-import { LogoutIcon } from "@heroicons/react/outline";
+import {
+  ChevronDownIcon,
+  LogoutIcon,
+  MoonIcon,
+  SunIcon,
+} from "@heroicons/react/outline";
 
 export interface HeaderProps {}
 export interface HeaderItem {
@@ -28,6 +33,36 @@ const Header: React.FC<HeaderProps> = () => {
   const [user] = useAuthState(auth);
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const [theme, setTheme] = useState("light");
+
+  const updateTheme = () => {
+    const localTheme = localStorage.getItem("theme") ?? theme;
+
+    setTheme(localTheme);
+    document.querySelector("html")?.setAttribute("data-theme", localTheme);
+    localTheme === "dark" &&
+      document.querySelector("html")?.classList.add("dark");
+  };
+
+  const changeTheme = () => {
+    if (theme === "light") {
+      document.querySelector("html")?.setAttribute("data-theme", "dark");
+      document.querySelector("html")?.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+      setTheme("dark");
+    } else {
+      document.querySelector("html")?.setAttribute("data-theme", "light");
+      document.querySelector("html")?.classList.remove("dark");
+
+      localStorage.setItem("theme", "light");
+      setTheme("light");
+    }
+  };
+
+  useEffect(() => {
+    updateTheme();
+  }, []);
 
   return (
     <div className="navbar bg-primary text-gray-200 shadow-lg mb-16 py-3 px-5 w-full font-inter">
@@ -84,6 +119,7 @@ const Header: React.FC<HeaderProps> = () => {
                   </div>
                 </div>
                 {user.displayName}
+                <ChevronDownIcon className="w-5 h-5 ml-1" />
               </div>
               <ul
                 tabIndex={0}
@@ -110,6 +146,13 @@ const Header: React.FC<HeaderProps> = () => {
               </ul>
             </div>
           )}
+          <button onClick={changeTheme} className="btn btn-ghost">
+            {theme === "light" ? (
+              <MoonIcon className="w-6 h-6" />
+            ) : (
+              <SunIcon className="w-6 h-6" />
+            )}
+          </button>
         </div>
         <LoginModal isOpen={isOpen} onClose={onClose} onOpen={onOpen} />
       </div>

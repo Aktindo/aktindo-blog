@@ -20,7 +20,7 @@ export const Home: FC<HomeProps> = ({ allPostsData, blogCategories }) => {
   const [activeCategory, setActiveCategory] = useState("all");
 
   return (
-    <section className="home flex flex-col min-h-screen font-inter">
+    <section className="home flex flex-col min-h-screen font-inter bg-base-100 text-base-content">
       {useDocumentMetaData("Home", "A place where I post my blogs.")}
       <Header />
       <div className="header grid justify-center text-center my-10">
@@ -35,7 +35,7 @@ export const Home: FC<HomeProps> = ({ allPostsData, blogCategories }) => {
           <p className="text-3xl font-bold font-poppins">
             <span className="text-primary">Aktindo</span> Blog
           </p>
-          <p className="text-lg font-medium text-gray-600">
+          <p className="text-lg font-medium text-gray-600 dark:text-gray-300">
             Developing something <span className="text-primary">useless</span>
           </p>
         </div>
