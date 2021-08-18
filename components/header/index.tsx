@@ -6,7 +6,7 @@ import { useRouter } from "next/dist/client/router";
 import { faBars } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { LoginModal } from "..";
-import { toast, useDisclosure, useToast } from "@chakra-ui/react";
+import { toast, useColorMode, useDisclosure, useToast } from "@chakra-ui/react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../../firebase";
 import {
@@ -63,6 +63,8 @@ const Header: React.FC<HeaderProps> = () => {
   useEffect(() => {
     updateTheme();
   }, []);
+
+  const { colorMode, toggleColorMode } = useColorMode();
 
   return (
     <div className="navbar bg-primary text-gray-200 shadow-lg mb-16 py-3 px-5 w-full font-inter">
@@ -131,7 +133,7 @@ const Header: React.FC<HeaderProps> = () => {
                       toast({
                         title: "Logged out successfully.",
                         status: "success",
-                        duration: 10 * 1000,
+                        duration: 5 * 1000,
                         isClosable: true,
                         position: "top",
                       })
@@ -146,7 +148,12 @@ const Header: React.FC<HeaderProps> = () => {
               </ul>
             </div>
           )}
-          <button onClick={changeTheme} className="btn btn-ghost">
+          <button
+            onClick={() => {
+              changeTheme();
+            }}
+            className="btn btn-ghost"
+          >
             {theme === "light" ? (
               <MoonIcon className="w-6 h-6" />
             ) : (

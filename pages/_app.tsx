@@ -24,14 +24,16 @@ function MyApp({ Component, pageProps }) {
 
   useEffect(() => {
     if (user) {
-      db.collection("users").doc(user.uid).set(
-        {
-          email: user.email,
-          username: user.displayName,
-          photoURL: user.photoURL,
-        },
-        { merge: true }
-      );
+      db.collection("users")
+        .doc(user.uid)
+        .set(
+          {
+            email: user.email,
+            username: user.displayName ?? user.email,
+            photoURL: user.photoURL,
+          },
+          { merge: true }
+        );
     }
   }, [user]);
 

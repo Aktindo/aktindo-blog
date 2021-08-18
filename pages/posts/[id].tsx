@@ -1,9 +1,17 @@
 import React, { useState } from "react";
-import { Footer, Header, PostHeader } from "../../components";
 import {
+  Footer,
+  Header,
+  PostHeader,
+  Divider,
+  PostLikes,
+} from "../../components";
+import {
+  ReplyIcon,
   ThumbDownIcon,
   ThumbUpIcon,
   TrashIcon,
+  XIcon,
 } from "@heroicons/react/outline";
 import { Post as PostI } from "../_app";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -28,39 +36,16 @@ export interface PostProps {
 
 const Post: React.FC<PostProps> = ({ postData }) => {
   const [user] = useAuthState(auth);
-  const [comment, setComment] = useState("");
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [reply, setReply] = useState<string>("");
+  const [repliesVisible, setRepliesVisible] = useState<string | null>(null);
+  const [comment, setComment] = useState<string>("");
   const postRef = db.collection("posts").doc(postData.id);
   const commentsRef = postRef.collection("comments");
   const [postSnapshot] = useDocumentData(postRef);
   const [commentsSnapshot] = useCollection(
     commentsRef.orderBy("postedOn", "desc")
   );
-
-  const likePost = () => {
-    postRef?.set(
-      {
-        usersLiked: firebase.firestore.FieldValue.arrayUnion({
-          id: user?.uid,
-          name: user?.displayName,
-          photoURL: user?.photoURL,
-        }),
-      },
-      { merge: true }
-    );
-  };
-
-  const unlikePost = () => {
-    postRef?.set(
-      {
-        usersLiked: firebase.firestore.FieldValue.arrayRemove({
-          id: user?.uid,
-          name: user?.displayName,
-          photoURL: user?.photoURL,
-        }),
-      },
-      { merge: true }
-    );
-  };
 
   const likeComment = (commentId) => {
     commentsRef?.doc(commentId).set(
@@ -109,6 +94,26 @@ const Post: React.FC<PostProps> = ({ postData }) => {
     setComment("");
   };
 
+  const postReply = (commentId: string) => {
+    commentsRef?.doc(commentId).set(
+      {
+        replies: firebase.firestore.FieldValue.arrayUnion({
+          comment: reply,
+          user: {
+            id: user?.uid,
+            name: user?.displayName,
+            photoURL: user?.photoURL,
+          },
+          postedOn: firebase.firestore.Timestamp.now(),
+        }),
+      },
+      { merge: true }
+    );
+
+    setReply("");
+    setRepliesVisible(null);
+  };
+
   const toast = useToast();
 
   return (
@@ -130,81 +135,23 @@ const Post: React.FC<PostProps> = ({ postData }) => {
             </div>
           ))}
         </div>
-        <div className="mt-5 flex">
-          <div className="flex items-center">
-            <button
-              className={`btn btn-sm ${
-                postSnapshot?.usersLiked?.find(
-                  (userLiked) => userLiked?.id === user?.uid
-                )
-                  ? " btn-primary btn-outline"
-                  : " btn-ghost"
-              }`}
-              onClick={() => {
-                if (!user) {
-                  return toast({
-                    title: "Uh oh! You must be logged in to like posts.",
-                    status: "error",
-                    duration: 10 * 1000,
-                    isClosable: true,
-                    position: "top",
-                  });
-                }
-
-                if (
-                  postSnapshot?.usersLiked?.find(
-                    (userLiked) => userLiked?.id === user?.uid
-                  )
-                ) {
-                  console.log("e");
-                  unlikePost();
-                  return;
-                }
-
-                likePost();
-                return toast({
-                  title: "Added to liked posts.",
-                  status: "success",
-                  duration: 10 * 1000,
-                  isClosable: true,
-                  position: "top",
-                });
-              }}
-            >
-              <FontAwesomeIcon icon={faThumbsUp} className="mr-1" />
-              {postSnapshot?.usersLiked?.length ?? 0}
-            </button>
-            <AvatarGroup size="md" max={3} mx={2}>
-              {postSnapshot?.usersLiked?.map((user) => (
-                <Avatar
-                  key={user?.id}
-                  size="md"
-                  src={user?.photoURL}
-                  name={user?.name}
-                />
-              ))}
-            </AvatarGroup>
-          </div>
-
-          <div className="ml-auto my-auto">
-            <a
-              target="_blank"
-              rel="_noreferrer"
-              href={`https://twitter.com/intent/tweet?text=${postData.title} - https://blog.aktindo.com/posts/${postData.id}`}
-            >
-              <FontAwesomeIcon icon={faTwitter} className="text-gray-500 w-5" />
-            </a>
-          </div>
-        </div>
-        <div className="divider"></div>
+        <PostLikes
+          user={user}
+          postData={postData}
+          postSnapshot={postSnapshot}
+          postRef={postRef}
+        />
+        <Divider />
         <div>
           <div>
             <div>
               <p className="text-xl font-poppins font-bold">
                 {commentsSnapshot?.docs?.length} Comments{" "}
-                <span className="text-sm text-gray-600 dark:text-gray-300">
-                  (login to post a comment)
-                </span>
+                {!user && (
+                  <span className="text-sm text-gray-600 font-medium dark:text-gray-300">
+                    (login to post a comment)
+                  </span>
+                )}
               </p>
               {user && (
                 <div className="form-control">
@@ -234,119 +181,209 @@ const Post: React.FC<PostProps> = ({ postData }) => {
                 const commentData = doc.data();
 
                 return (
-                  <div className="comment flex bg-base-200 px-2 py-4 my-2 rounded-box max-w-prose">
-                    <div className="avatar">
-                      <div className="rounded-full w-10 h-10 ring ring-primary ring-offset-2 dark:ring-offset-0 mx-2">
-                        <img
-                          src={commentData?.user.photoURL}
-                          alt={`${commentData?.user.name}'s Avatar`}
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <div className="ml-1">
-                        <div className="flex">
-                          <p className="font-medium flex w-full">
-                            <span>{commentData?.user.name}</span>
-                            <span className="ml-1 text-sm mt-0.5 text-gray-600 dark:text-gray-300">
-                              {dayjs(commentData?.postedOn?.toDate()).fromNow()}
-                            </span>
-                          </p>
+                  <>
+                    <div className="comment flex bg-base-200 px-2 py-4 my-2 rounded-box max-w-prose">
+                      <div className="avatar">
+                        <div className="rounded-full w-10 h-10 ring ring-primary ring-offset-2 dark:ring-offset-0 mx-2">
+                          <img
+                            src={commentData?.user.photoURL}
+                            alt={`${commentData?.user.name}'s Avatar`}
+                          />
                         </div>
-                        <p className="break-all ">{commentData?.comment}</p>
                       </div>
-                      <div className="mt-1 flex">
-                        <div className="flex items-center">
+                      <div>
+                        <div className="ml-1">
+                          <div className="flex">
+                            <p className="font-medium flex w-full">
+                              <span>{commentData?.user.name}</span>
+                              <span className="ml-1 text-sm mt-0.5 text-gray-600 dark:text-gray-300">
+                                {dayjs(
+                                  commentData?.postedOn?.toDate()
+                                ).fromNow()}
+                              </span>
+                            </p>
+                          </div>
+                          <p className="break-all ">{commentData?.comment}</p>
+                        </div>
+                        <div className="mt-1 flex">
+                          <div className="flex items-center">
+                            <button
+                              className={`btn btn-sm px-1${
+                                commentData?.likes?.includes(user?.uid)
+                                  ? " btn-primary btn-outline"
+                                  : " btn-ghost"
+                              }`}
+                              onClick={() => {
+                                if (!user) {
+                                  return toast({
+                                    title:
+                                      "Uh oh! You must be logged in to like comments.",
+                                    status: "error",
+                                    duration: 5 * 1000,
+                                    isClosable: true,
+                                    position: "top",
+                                  });
+                                }
+
+                                if (commentData?.likes?.includes(user.uid)) {
+                                  unlikeComment(doc.id);
+                                  return;
+                                }
+
+                                likeComment(doc.id);
+                                return toast({
+                                  title: "You liked this comment.",
+                                  status: "success",
+                                  duration: 5 * 1000,
+                                  isClosable: true,
+                                  position: "top",
+                                });
+                              }}
+                            >
+                              <ThumbUpIcon className="w-5 h-5" />{" "}
+                              {commentData?.likes?.length || 0}
+                            </button>
+                          </div>
                           <button
-                            className={`btn btn-sm px-1${
-                              commentData?.likes?.includes(user?.uid)
+                            className={`btn btn-sm btn-circle ml-1 px-1${
+                              commentData?.dislikes?.includes(user?.uid)
                                 ? " btn-primary btn-outline"
                                 : " btn-ghost"
                             }`}
                             onClick={() => {
-                              if (!user) {
+                              if (!user)
                                 return toast({
                                   title:
-                                    "Uh oh! You must be logged in to like comments.",
+                                    "Uh oh! You must be logged in to dislike comments.",
                                   status: "error",
-                                  duration: 10 * 1000,
+                                  duration: 5 * 1000,
                                   isClosable: true,
                                   position: "top",
                                 });
-                              }
 
-                              if (commentData?.likes?.includes(user.uid)) {
-                                unlikeComment(doc.id);
-                                return;
-                              }
+                              if (commentData?.dislikes?.includes(user?.uid))
+                                return unlikeComment(doc.id);
 
-                              likeComment(doc.id);
+                              dislikeComment(doc.id);
                               return toast({
-                                title: "You liked this comment.",
+                                title: "You disliked this comment.",
                                 status: "success",
-                                duration: 10 * 1000,
+                                duration: 5 * 1000,
                                 isClosable: true,
                                 position: "top",
                               });
                             }}
                           >
-                            <ThumbUpIcon className="w-5 h-5" />{" "}
-                            {commentData?.likes?.length || 0}
+                            <ThumbDownIcon className="w-5 h-5" />
                           </button>
-                        </div>
-                        <button
-                          className={`btn btn-sm btn-circle ml-1 px-1${
-                            commentData?.dislikes?.includes(user?.uid)
-                              ? " btn-primary btn-outline"
-                              : " btn-ghost"
-                          }`}
-                          onClick={() => {
-                            if (!user) {
-                              return toast({
-                                title:
-                                  "Uh oh! You must be logged in to dislike comments.",
-                                status: "error",
-                                duration: 10 * 1000,
-                                isClosable: true,
-                                position: "top",
-                              });
-                            }
-
-                            if (commentData?.dislikes?.includes(user?.uid)) {
-                              unlikeComment(doc.id);
-                              return;
-                            }
-
-                            dislikeComment(doc.id);
-                            return toast({
-                              title: "You disliked this comment.",
-                              status: "success",
-                              duration: 10 * 1000,
-                              isClosable: true,
-                              position: "top",
-                            });
-                          }}
-                        >
-                          <ThumbDownIcon className="w-5 h-5" />
-                        </button>
-                        {user?.uid == commentData?.user.id && (
                           <button
-                            className="btn btn-sm btn-ghost btn-circle ml-2"
-                            onClick={() => removeComment(doc.id)}
+                            className="btn btn-sm btn-circle btn-ghost ml-2"
+                            onClick={() => {
+                              if (!user) {
+                                setReplyingTo(null);
+                                return toast({
+                                  title:
+                                    "Uh oh! You must be logged in to reply to comments.",
+                                  status: "error",
+                                  duration: 5 * 1000,
+                                  isClosable: true,
+                                  position: "top",
+                                });
+                              }
+
+                              setReplyingTo(commentData?.user.id);
+                            }}
                           >
-                            <TrashIcon className="w-5 h-5 text-red-500" />
+                            <ReplyIcon className="w-5 h-5" />
+                          </button>
+                          {user?.uid == commentData?.user.id && (
+                            <button
+                              className="btn btn-sm btn-ghost btn-circle"
+                              onClick={() => removeComment(doc.id)}
+                            >
+                              <TrashIcon className="w-5 h-5 text-red-500" />
+                            </button>
+                          )}
+                        </div>
+                        {replyingTo === commentData?.user.id && (
+                          <div className="form-control w-full pr-5">
+                            <label className="label">
+                              <span className="label-text flex items-center">
+                                Replying to {commentData?.user.name}
+                              </span>
+                            </label>
+                            <div className="relative">
+                              <input
+                                type="text"
+                                placeholder="Start writing..."
+                                className="w-full pr-16 input input-primary input-bordered"
+                                value={reply}
+                                onChange={(e) => setReply(e.target.value)}
+                              />
+                              <button
+                                className="absolute top-0 right-0 rounded-l-none btn btn-primary"
+                                onClick={() => {
+                                  postReply(doc.id);
+                                  setReplyingTo(null);
+                                }}
+                              >
+                                POST
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                        {commentData?.replies?.length && (
+                          <button
+                            className="mt-2 btn btn-sm btn-ghost"
+                            onClick={() =>
+                              !repliesVisible
+                                ? setRepliesVisible(doc.id)
+                                : setRepliesVisible(null)
+                            }
+                          >
+                            {repliesVisible?.length
+                              ? repliesVisible === doc.id
+                                ? "Hide"
+                                : "View"
+                              : "View"}{" "}
+                            {commentData?.replies?.length} replies
                           </button>
                         )}
+                        <div className="replies mt-2">
+                          {commentData?.replies?.length > 0 &&
+                            repliesVisible === doc.id &&
+                            commentData?.replies.map((reply) => (
+                              <div className="mt-2">
+                                <div className="flex">
+                                  <img
+                                    src={reply.user.photoURL}
+                                    alt={`${reply.user.name}'s Avatar`}
+                                    className="w-8 h-8 rounded-full mr-1"
+                                  />
+                                  <div className="ml-1">
+                                    <p className="font-medium flex w-full">
+                                      <span>{reply.user.name}</span>
+                                      <span className="ml-1 text-sm mt-0.5 text-gray-600 dark:text-gray-300">
+                                        {dayjs(
+                                          reply.postedOn.toDate()
+                                        ).fromNow()}
+                                      </span>
+                                    </p>
+                                    <p className="break-all">{reply.comment}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  </>
                 );
               })}
             </div>
           </div>
         </div>
       </div>
-
       <Footer />
     </section>
   );

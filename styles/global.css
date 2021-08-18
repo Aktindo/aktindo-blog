@@ -16,6 +16,10 @@ h3 {
   font-family: "Inter", sans-serif;
 }
 
+.btn-error {
+  @apply text-white;
+}
+
 .task-list-item {
   @apply flex items-center;
 }

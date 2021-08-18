@@ -19,5 +19,6 @@ const auth = app.auth();
 const rtdb = firebase.database();
 
 const googleProvider = new firebase.auth.GoogleAuthProvider();
+const githubProvider = new firebase.auth.GithubAuthProvider();
 
-export { db, auth, rtdb, googleProvider };
+export { db, auth, rtdb, googleProvider, githubProvider };

@@ -6,5 +6,6 @@ export { BlogPost } from "./blogPost";
 export { Footer } from "./footer";
 export { Loader } from "./loader";
 export { PostHeader } from "./postHeader";
+export { PostLikes } from "./postLikes";
 
 export * from "./modals";

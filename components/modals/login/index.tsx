@@ -5,16 +5,11 @@ import {
   ModalFooter,
   ModalOverlay,
   useToast,
-  useDisclosure,
 } from "@chakra-ui/react";
-import {
-  faGithub,
-  faGoogle,
-  faTwitter,
-} from "@fortawesome/free-brands-svg-icons";
+import { faGithub, faGoogle } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useState } from "react";
-import { auth, googleProvider } from "../../../firebase";
+import React from "react";
+import { auth, githubProvider, googleProvider } from "../../../firebase";
 
 export interface LoginModalProps {
   onOpen: () => void;
@@ -49,7 +44,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ onOpen, onClose, isOpen }) => {
                     return toast({
                       title: "Logged in successfully.",
                       status: "success",
-                      duration: 10 * 1000,
+                      duration: 5 * 1000,
                       isClosable: true,
                       position: "top",
                     });
@@ -59,7 +54,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ onOpen, onClose, isOpen }) => {
                       title: "Uh oh! An error occured.",
                       description: e.message,
                       position: "top",
-                      duration: 10 * 1000,
+                      duration: 5 * 1000,
                       status: "error",
                     })
                   )
